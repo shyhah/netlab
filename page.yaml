@@ -1,0 +1,35 @@
+# page.yaml: the words on your page, kept as data like everything else.
+# make_page.py puts each answer under its question. A few sentences each, in your own words;
+# leave a blank line between paragraphs. Refer to YOUR network and YOUR evidence.
+# Never put your name or full student ID here: the page is public.
+
+repository: https://github.com/shyhah/netlab
+
+answers:
+  planes:
+    question: "Where are the data, control and management planes in your network?"
+    answer: "The data plane is the bridges (s1, s2, s3) which forward the frames. The control plane is inside each bridge which learns MAC addresses by itself. The management plane is me using topology.yaml, build_topo.py and the Mininet CLI to configure and monitor the network."
+  
+  learning:
+    question: "How did your switches learn which port leads to each host? Use your MAC table evidence."
+    answer: "The switch records each frame's source MAC address and the port it came in on. My macs.txt shows that on s1, h1 is on port 1 and h2 is on port 2. The MACs of h3 to h6 appear on port 3 (the port that connects s1 to s2)." 
+ 
+  kind:
+    question: "Which of the four kinds of programmability is this assignment (a network described as data, then built and documented by scripts)? Why isn't it any of the other three?"
+    answer: "It is (d) automated configuration management because the network is produced from a data file, checked by check(), built by a script and tracked in Git. It is not (a) because packet processing is unchanged, not (b) because there is no controller, and not (c) because I never use a device API like NETCONF."
+
+  two_am:
+    question: "Week 1's 2 a.m. change on 40 switches: what would be different if those switches were described like your network?"
+    answer: "I would edit one file instead of logging in to 40 switches. git diff shows exactly what changes, check() catches mistakes before anything is applied and a script applies the change to all 40 the same way. If something goes wrong, I can go back to the previous commit."
+  
+  model:
+    question: "What's the difference between your network's data model and its serialisation? Use YAML and JSON as the example."
+    answer: "The data model is what the network contains like switches, hosts and links. The serialisation is the file format used to write it down. For example : topology.yaml and topology.json are written differently but build the same network. Only the comments were lost in JSON because JSON has no comments."
+  
+  check:
+    question: "Why is it better to catch bad data in check() than with pingall? What did IPv6 notice about a duplicate address that IPv4 didn't?"
+    answer: "check() stops bad data before the network is built and names the problem while pingall only showed 11/12 replies which the duplicate address was easy to miss. IPv6 marked the duplicate address as dadfailed and stopped using it while IPv4 accepted the duplicate without any warning."
+ 
+  git:
+    question: "What does your Git history give you that copying files into folders named topology-v2-final wouldn't?"
+    answer: "Git shows what changed, when and why, and lets me go back to any version I want."
