@@ -1,17 +1,19 @@
-# topology.yaml â€” a small network described as data.
-# build_topo.py reads this file and creates exactly this network in Mininet.
+# topology.yaml - my own network, described as data.
+# build_topo.py builds it in Mininet; make_page.py turns it into my web page.
 #
-# Make it yours first (see "Your addresses" in the lab):
-#   NNNN = the last 4 digits of your student ID, e.g. 4207
-#   NN   = the last 2 digits, without a leading zero, e.g. 7
-# Replace every NNNN and NN below. Don't put your full student ID here: this file
-# goes in your repository, which may be public.
+#   h1  h2        h3  h4        h5  h6
+#     \  /          \  /          \  /
+#      s1 -------- s2 -------- s3
+#
+# Three Linux bridges in a line, two hosts on each. A line (no loop) because
+# plain Linux bridges don't run Spanning Tree: a loop would flood frames forever.
 
 student_id_last4: "1940"
 
 switches:
   - s1
   - s2
+  - s3
 
 hosts:
   - name: h1
@@ -26,11 +28,22 @@ hosts:
   - name: h4
     ip: 10.40.0.4/24
     ipv6: fd00:1940::4/64
+  - name: h5
+    ip: 10.40.0.5/24
+    ipv6: fd00:1940::5/64
+  - name: h6
+    ip: 10.40.0.6/24
+    ipv6: fd00:1940::6/64
 
 # Each link joins two nodes.
 links:
+  # hosts to their switch
   - [h1, s1]
   - [h2, s1]
-  - [h3, s1]
+  - [h3, s2]
   - [h4, s2]
+  - [h5, s3]
+  - [h6, s3]
+  # switch to switch
   - [s1, s2]
+  - [s2, s3]
