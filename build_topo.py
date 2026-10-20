@@ -55,6 +55,7 @@ def check(spec):
     """Return a list of problems in the description (an empty list means it looks fine).
 
     Week 2 task: report any IP address that is used by more than one host.
+    Assignment: also report any link that names a switch or host that doesn't exist.
     """
     problems = []
     seen = {}  # address -> name of the host that uses it
@@ -67,6 +68,13 @@ def check(spec):
                 problems.append(f"{host['name']} and {seen[address]} both use {address}")
             else:
                 seen[address] = host["name"]
+
+    # Every link must join two nodes that exist.
+    nodes = set(spec["switches"]) | {host["name"] for host in spec["hosts"]}
+    for a, b in spec["links"]:
+        for end in (a, b):
+            if end not in nodes:
+                problems.append(f"link {a} - {b} uses {end}, which isn't a switch or host")
     return problems
 
 

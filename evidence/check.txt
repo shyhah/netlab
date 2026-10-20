@@ -1,0 +1,4 @@
+PROBLEM: h6 and h5 both use 10.40.0.5
+PROBLEM: h6 and h5 both use fd00:1940::5
+PROBLEM: link s3 - s9 uses s9, which isn't a switch or host
+Fix the description and try again.

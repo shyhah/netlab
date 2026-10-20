@@ -1,0 +1,55 @@
+# bad.yaml - a copy of topology.yaml with two deliberate mistakes, to prove check() works:
+#   1. h6 uses the same addresses as h5
+#   2. a link to s9, which doesn't exist
+#
+# (original header follows)
+# topology.yaml - my own network, described as data.
+# build_topo.py builds it in Mininet; make_page.py turns it into my web page.
+#
+#   h1  h2        h3  h4        h5  h6
+#     \  /          \  /          \  /
+#      s1 -------- s2 -------- s3
+#
+# Three Linux bridges in a line, two hosts on each. A line (no loop) because
+# plain Linux bridges don't run Spanning Tree: a loop would flood frames forever.
+
+student_id_last4: "1940"
+
+switches:
+  - s1
+  - s2
+  - s3
+
+hosts:
+  - name: h1
+    ip: 10.40.0.1/24
+    ipv6: fd00:1940::1/64
+  - name: h2
+    ip: 10.40.0.2/24
+    ipv6: fd00:1940::2/64
+  - name: h3
+    ip: 10.40.0.3/24
+    ipv6: fd00:1940::3/64
+  - name: h4
+    ip: 10.40.0.4/24
+    ipv6: fd00:1940::4/64
+  - name: h5
+    ip: 10.40.0.5/24
+    ipv6: fd00:1940::5/64
+  - name: h6
+    ip: 10.40.0.5/24          # MISTAKE 1: same as h5
+    ipv6: fd00:1940::5/64     # MISTAKE 1: same as h5
+
+# Each link joins two nodes.
+links:
+  # hosts to their switch
+  - [h1, s1]
+  - [h2, s1]
+  - [h3, s2]
+  - [h4, s2]
+  - [h5, s3]
+  - [h6, s3]
+  # switch to switch
+  - [s1, s2]
+  - [s2, s3]
+  - [s3, s9]                   # MISTAKE 2: there is no s9
