@@ -1,0 +1,66 @@
+# network.yaml: my routed network, as data.
+#
+#   python3 build_routed.py network.yaml      checks it, then builds it in Mininet
+#   python3 make_page3.py network.yaml        checks it, then writes docs/week3/index.html
+#
+# Each LAN has one router (.1 on the LAN) and one host (.10).
+# On each link, the first router named is .1 and the second is .2.
+
+student_id_last4: "1940"
+
+routers: [r1, r2, r3, r4]
+
+lans:
+  - name: lan-h1
+    network: 10.40.1.0/24
+    router: r1
+    host: h1
+  - name: lan-h2
+    network: 10.40.2.0/24
+    router: r2
+    host: h2
+  - name: lan-h3
+    network: 10.40.32.0/24
+    router: r3
+    host: h3
+  - name: lan-h4
+    network: 10.40.33.0/24
+    router: r4
+    host: h4
+
+# The four links form a ring (r1-r2-r3-r4-r1): a redundant path, so every pair of
+# routers can reach each other two ways
+links:
+  - [r1, r2, 10.40.12.0/30]
+  - [r2, r3, 10.40.23.0/30]
+  - [r3, r4, 10.40.34.0/30]
+  - [r1, r4, 10.40.14.0/30]
+
+routes:
+  r1:
+    - to: 10.40.2.0/24
+      via: 10.40.12.2
+    # Summary route: 10.40.32.0/23 covers h3's LAN (10.40.32.0/24) and h4's LAN (10.40.33.0/24)
+    - to: 10.40.32.0/23
+      via: 10.40.14.2
+  r2:
+    - to: 10.40.1.0/24
+      via: 10.40.12.1
+    - to: 10.40.32.0/24
+      via: 10.40.23.2
+    - to: 10.40.33.0/24
+      via: 10.40.23.2
+  r3:
+    - to: 10.40.1.0/24
+      via: 10.40.34.2
+    - to: 10.40.2.0/24
+      via: 10.40.23.1
+    - to: 10.40.33.0/24
+      via: 10.40.34.2
+  r4:
+    - to: 10.40.1.0/24
+      via: 10.40.14.1
+    - to: 10.40.2.0/24
+      via: 10.40.14.1
+    - to: 10.40.32.0/24
+      via: 10.40.34.1
