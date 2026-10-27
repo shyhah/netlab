@@ -1,0 +1,19 @@
+# page3.yaml: the words on your Week 3 page. make_page3.py puts each answer under its question.
+# A few sentences each, in your own words, about YOUR network and YOUR evidence.
+# Leave a blank line between paragraphs. Never put your name or full student ID here.
+
+repository: https://github.com/shyhah/netlab
+
+answers:
+  design:
+    question: "Describe your design: why these routers, LANs and links, and how you chose the addresses."
+    answer: "I designed the network using four routers (r1, r2, r3 and r4) and four LANs, each with one host (h1 to h4). Each LAN uses a /24 subnet for the host and its router gateway and the routers are connected with /30 subnets which give two usable addresses for each point-to-point link. I connected the routers so their links form a loop (r1-r2-r3-r4-r1), so every pair of routers has two paths. The other path exists if one link fails, but static routes cannot switch to it by themselves. I chose all addresses from my block 10.40.0.0/16. The LANs use 10.40.1.0/24, 10.40.2.0/24, 10.40.32.0/24 and 10.40.33.0/24. I put h3 and h4 next to each other so they can be covered by one summary route (10.40.32.0/23). The router links use 10.40.12.0/30, 10.40.23.0/30, 10.40.34.0/30 and 10.40.14.0/30, named after the routers they join."
+  summary:
+    question: "Which route summarises several LANs? Which networks does it cover, why is it correct, and what else would it attract if you added a network inside its range?"
+    answer: "The route 10.40.32.0/23 on r1 is my summary route. It covers the addresses from 10.40.32.0 to 10.40.33.255 which is exactly h3's LAN (10.40.32.0/24) and h4's LAN (10.40.33.0/24) but not h1's or h2's. It is correct because both LANs fall within the /23 and r4 can reach both of them (h4 directly and h3 through r3). If another network were added inside this range, it would also match the summary route because its addresses would fall inside 10.40.32.0/23. So r1 would send its traffic to r4 even if that network was somewhere else, unless I added a more specific route."
+  failure:
+    question: "When you took a link down, what happened, and why couldn't your routes recover even though another path existed? What would have recovered?"
+    answer: "When I took the r1-r4 link down, h1's traceroute to h3 stopped at r1 with !N and r1 said Network is unreachable. This is because a static route has only one fixed next hop, so r1's route to h3 still depended on the link that was down, even though the path through r2 and r3 still worked. A dynamic routing protocol such as OSPF would have noticed the failure and moved the traffic to the other path."
+  control_plane:
+    question: "In your network, what was the control plane? Who worked out the routes, and what does that mean for a network of 40 routers?"
+    answer: "In my network, the control plane was me, because I worked out every route by hand. I decided which paths packets should take, wrote the routes in network.yaml, and build_routed.py added them to each router's routing table. For a network of 40 routers, working out routes manually would be time-consuming and prone to errors and nothing would react when a link fails. A dynamic routing protocol such as OSPF could automatically calculate the best paths and update the routes when the network changes."
