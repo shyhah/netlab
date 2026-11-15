@@ -2,21 +2,21 @@
 # A few sentences each, in your own words, about YOUR overlay and YOUR evidence.
 # Leave a blank line between paragraphs. Don't put your name or your full student ID in this file.
 
-repository: https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
+repository: https://github.com/shyhah/netlab
 
 answers:
   design:
     question: "Describe your design: hypervisors, tenants, VNIs and addresses. Which tenants overlap, and why did you place each VM where you did?"
-    answer: ""
+    answer: "I have 3 hypervisors (hv1, hv2, hv3) on the underlay 10.40.0.0/24 and 2 tenants, alpha (VNI 1100) and beta (VNI 2200). Both tenants use 10.40.60.0/24, so their addresses overlap. alpha2 and beta2 are both 10.40.60.11. I put alpha on all 3 hypervisors to see flooding reach more than one VTEP and beta on hv1 and hv3. hv1 and hv3 host both tenants to show they stay apart even on the same hypervisor."
   isolation:
-    question: "Two of your VMs have the same IP address. Using your evidence, explain how a ping reaches the right one â€” and what would have to go wrong for one tenant to see another's traffic."
-    answer: ""
+    question: "Two of your VMs have the same IP address. Using your evidence, explain how a ping reaches the right one - and what would have to go wrong for one tenant to see another's traffic."
+    answer: "Each tenant has its own bridge and VXLAN device with a separate VNI to keep their network traffic isolated. In isolation.txt, alpha1 and beta1 pinged the same IP address but got answers from their own tenants. alpha1 got alpha2's MAC (02:00:04:4c:00:0b) and beta1 got beta2's MAC (02:00:08:98:00:0b). When alpha1 was pinging, beta2 captured 0 packets. This shows that tenants cannot see each other's traffic unless the configuration is incorrect such as using the same VNI or connecting a VM to the wrong bridge."
   flood_learn:
-    question: "Using your evidence, explain what was flooded, to which hypervisors, and what each VTEP learned. With 50 hypervisors in one VNI, how many copies would one broadcast need â€” and how would EVPN change that?"
-    answer: ""
+    question: "Using your evidence, explain what was flooded, to which hypervisors, and what each VTEP learned. With 50 hypervisors in one VNI, how many copies would one broadcast need - and how would EVPN change that?"
+    answer: "Before any traffic, hv1 had two flood entries pointing to hv2 and hv3. When alpha1 pinged alpha2, its ARP broadcast was sent to both hypervisors. After that, hv1 learned that alpha2's MAC was behind hv2 while hv3 learned alpha1's MAC was behind hv1. With 50 hypervisors in one VNI, one broadcast would need 49 copies. EVPN would use a control plane to share MAC address locations with all VTEPs to reduce the need for flooding and learning."
   mtu:
     question: "Compare your two MTU fixes using your measurements. Which would you choose for a data centre, what does each cost, and who has to change what?"
-    answer: ""
+    answer: "Without a fix, packets larger than 1450 bytes were lost and iperf3 dropped to 0 bits/sec. Fix A achieved 3.95 Gbit/s while Fix B achieved 4.12 Gbit/s. Fix A reduces the tenant MTU to 1450, so every packet carries 50 fewer bytes of data and every tenant VM must be updated by its owner. Fix B keeps the tenant MTU at 1500 but requires all physical switches and network cards to support jumbo frames, so the network team must change the physical network. I would choose Fix A because it is easier to implement and does not require changes to the physical network."
   p4:
     question: "If your hypervisors' VTEPs were P4 switches running the lecture's vtep.p4, what would have to fill the vtep_encap table, and how? What would replace flood-and-learn?"
-    answer: ""
+    answer: "The `vtep_encap` table must be filled by a control plane because the P4 data plane cannot add table entries by itself. The control plane would add entries based on the VM's port, destination MAC address and VNI. For example, hv1 would use VNI 1100 to send alpha1's traffic to alpha2 through hv2 (10.40.0.2). EVPN or an SDN controller would replace flood-and-learn by learning VM locations and installing the table entries automatically before traffic is sent."
