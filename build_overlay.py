@@ -177,7 +177,14 @@ def check_mtu(spec):
     before anything is built.
     """
     problems = []
-    # TODO: your code here
+    underlay_mtu = int(spec["underlay"]["mtu"])
+    for t in spec["tenants"]:
+        needed = int(t["mtu"]) + VXLAN_OVERHEAD
+        if needed > underlay_mtu:
+            problems.append(
+                f"tenant {t['name']}: MTU {t['mtu']} + {VXLAN_OVERHEAD} bytes of VXLAN = {needed}, "
+                f"{needed - underlay_mtu} bytes more than the underlay MTU {underlay_mtu}"
+            )
     return problems
 
 
